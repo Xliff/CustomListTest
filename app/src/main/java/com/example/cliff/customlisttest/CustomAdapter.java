@@ -1,5 +1,6 @@
 package com.example.cliff.customlisttest;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
@@ -13,6 +14,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -99,11 +101,11 @@ public class CustomAdapter extends BaseAdapter {
 
             // Set background -- when we move this to an app, we will have to perform error checking.
             String bgColor = res.getString(
-                res.getIdentifier("background_" + vh.pd.team, "string", packageName)
+                    res.getIdentifier("background_" + vh.pd.team, "string", packageName)
             );
             GradientDrawable gd = new GradientDrawable(
-                GradientDrawable.Orientation.TOP_BOTTOM,
-                new int[] { Color.parseColor(bgColor), 0 }
+                    GradientDrawable.Orientation.TOP_BOTTOM,
+                    new int[]{Color.parseColor(bgColor), 0}
             );
             convertView.setBackground(gd);
 
@@ -120,16 +122,21 @@ public class CustomAdapter extends BaseAdapter {
             }
 
             // Set text data.
-            vh.tv_pos = (TextView)convertView.findViewById(R.id.t_Pos);
+            vh.tv_pos = (TextView) convertView.findViewById(R.id.t_Pos);
             vh.tv_pos.setText(vh.pd.pos);
-            vh.tv_fn = (TextView)convertView.findViewById(R.id.t_firstName);
+            vh.tv_fn = (TextView) convertView.findViewById(R.id.t_firstName);
             vh.tv_fn.setText(vh.pd.firstname);
-            vh.tv_ln = (TextView)convertView.findViewById(R.id.t_lastName);
+            vh.tv_ln = (TextView) convertView.findViewById(R.id.t_lastName);
             vh.tv_ln.setText(vh.pd.lastname);
-            vh.tv_bye = (TextView)convertView.findViewById(R.id.t_byeWeek);
+            vh.tv_bye = (TextView) convertView.findViewById(R.id.t_byeWeek);
             vh.tv_bye.setText("Bye: " + vh.pd.bye);
-            vh.tv_rank = (TextView)convertView.findViewById(R.id.t_adpRank);
+            vh.tv_rank = (TextView) convertView.findViewById(R.id.t_adpRank);
             vh.tv_rank.setText("#" + vh.pd.rank);
+
+            // Can't compute size of View until after it has been drawn on the screen!!
+            // Delay creation of view until after the first draw phase, or postpone this
+            // call until the user selects the item.
+            //
             // Views aren't dragged, but Bitmaps can be.
             //vh.b = loadBitmapFromView(convertView);
 
@@ -138,6 +145,8 @@ public class CustomAdapter extends BaseAdapter {
 
         return convertView;
     }
+
+
 
     class ViewHolder {
         ImageView i_Team;

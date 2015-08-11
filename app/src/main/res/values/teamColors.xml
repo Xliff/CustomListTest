@@ -1,0 +1,37 @@
+<resources>
+    <string name="background_ARI">#C60C30</string>
+    <string name="background_ATL">#111C24</string>
+    <string name="background_BAL">#241773</string>
+    <string name="background_BUF">#00338D</string>
+    <string name="background_CAR">#0088CE</string>
+    <string name="background_CHI">#031E2F</string>
+    <string name="background_CIN">#F9461C</string>
+    <string name="background_CLE">#332B2A</string>
+    <string name="background_DAL">#828A87</string>
+    <!--
+        <string name="background_DAL">#003591</string>
+    -->
+    <string name="background_DEN">#FF6319</string>
+    <string name="background_DET">#2A6EBB</string>
+    <string name="background_GB">#2C5E4F</string>
+    <string name="background_HOU">#A71930</string>
+    <string name="background_IND">#002395</string>
+    <string name="background_JAC">#006983</string>
+    <string name="background_KC">#C60C30</string>
+    <string name="background_MIA">#006265</string>
+    <string name="background_MIN">#4B306A</string>
+    <string name="background_NYG">#0B2265</string>
+    <string name="background_NYJ">#2C5E4F</string>
+    <string name="background_NE">#85888B</string>
+    <string name="background_NO">#968252</string>
+    <string name="background_OAK">#A5ACAF</string>
+    <string name="background_PHI">#004953</string>
+    <string name="background_PIT">#FFB612</string>
+    <string name="background_SD">#FFB612</string>
+    <string name="background_SF">#97233F</string>
+    <string name="background_SEA">#85888B</string>
+    <string name="background_STL">#95774D</string>
+    <string name="background_TB">#A71930</string>
+    <string name="background_TEN">#4B02DB</string>
+    <string name="background_WAS">#822433</string>
+</resources>
