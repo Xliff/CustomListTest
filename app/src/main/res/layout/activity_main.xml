@@ -5,26 +5,73 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/dragImage" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Custom List View Test"
+        android:id="@+id/t_Title"
+        android:layout_marginBottom="10dp" />
+
     <LinearLayout
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_alignBaseline="@+id/t_Title"
+        android:weightSum="1.0">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Custom List View Test"
-            android:id="@+id/t_Title"
-            android:layout_marginBottom="10dp"
-            android:layout_toEndOf="@id/t_Title" />
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="false"
+            android:layout_alignBaseline="@+id/t_Title"
+            android:layout_weight="0.5">
 
-        <ListView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/listView"
-            android:layout_alignParentStart="false"
-            android:layout_toEndOf="@id/t_Title" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Players"
+                android:id="@+id/textView2"
+                android:layout_marginTop="20dp" />
+
+            <ListView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/listView"
+                android:layout_alignParentStart="false"
+                android:layout_toEndOf="@id/t_Title" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Selections"
+                android:id="@+id/textView3"
+                android:layout_marginTop="20dp" />
+
+            <ListView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/listView2"
+                android:layout_alignParentStart="false"
+                android:layout_toEndOf="@id/t_Title" />
+
+        </LinearLayout>
     </LinearLayout>
 
 </RelativeLayout>

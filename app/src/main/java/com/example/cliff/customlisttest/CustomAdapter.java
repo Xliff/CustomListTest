@@ -3,8 +3,12 @@ package com.example.cliff.customlisttest;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +30,8 @@ public class CustomAdapter extends BaseAdapter {
     LayoutInflater mInflater;
     String packageName;
     Resources res;
+
+    static private final int LINE_THICKNESS = 1;
 
     ArrayList<PlayerData> items = new ArrayList<>();
 
@@ -61,6 +67,25 @@ public class CustomAdapter extends BaseAdapter {
         return 0;
     }
 
+    // Should be moved to a utilities JAR when appropriate.
+    public static Bitmap loadBitmapFromView(View v) {
+        Bitmap b = Bitmap.createBitmap( v.getLayoutParams().width, v.getLayoutParams().height, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(b);
+        Rect rect = new Rect(0, 0, b.getWidth(), b.getHeight());
+        Paint p = new Paint();
+
+        p.setStyle(Paint.Style.STROKE);
+        p.setStrokeWidth(LINE_THICKNESS);
+        p.setColor(Color.BLACK);
+
+        v.layout(v.getLeft(), v.getTop(), v.getRight(), v.getBottom());
+        v.draw(c);
+        c.drawBitmap(b, 0, 0, null);
+        c.drawRect(rect, p);
+
+        return b;
+    }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         // TODO Auto-generated method stub
@@ -84,7 +109,7 @@ public class CustomAdapter extends BaseAdapter {
 
             // Set team icon.
             AssetManager am = res.getAssets();
-            InputStream iData = null;
+            InputStream iData;
             vh.i_Team = (ImageView) convertView.findViewById(R.id.i_Team);
             try {
                 iData = am.open("Helmet-" + vh.pd.team + ".png");
@@ -105,6 +130,8 @@ public class CustomAdapter extends BaseAdapter {
             vh.tv_bye.setText("Bye: " + vh.pd.bye);
             vh.tv_rank = (TextView)convertView.findViewById(R.id.t_adpRank);
             vh.tv_rank.setText("#" + vh.pd.rank);
+            // Views aren't dragged, but Bitmaps can be.
+            //vh.b = loadBitmapFromView(convertView);
 
             convertView.setTag(vh);
         }
@@ -116,6 +143,7 @@ public class CustomAdapter extends BaseAdapter {
         ImageView i_Team;
         TextView tv_pos, tv_fn, tv_ln, tv_bye, tv_rank;
         PlayerData pd;
+        Bitmap b;
     }
 
 }
