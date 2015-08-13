@@ -9,7 +9,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/dragImage"
-        android:contentDescription="@string/drag_description" />
+        android:contentDescription="@string/drag_description"
+        android:visibility="gone" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -43,12 +44,10 @@
                 android:id="@+id/textView2"
                 android:layout_marginTop="20dp" />
 
-            <ListView
-                android:layout_width="fill_parent"
+            <com.example.cliff.customlisttest.DragDropListView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/listView"
-                android:layout_alignParentStart="false"
-                android:layout_toEndOf="@id/t_Title" />
+                android:id="@+id/playerList" />
 
         </LinearLayout>
 
@@ -66,12 +65,10 @@
                 android:id="@+id/textView3"
                 android:layout_marginTop="20dp" />
 
-            <ListView
-                android:layout_width="fill_parent"
+            <com.example.cliff.customlisttest.DragDropListView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/listView2"
-                android:layout_alignParentStart="false"
-                android:layout_toEndOf="@id/t_Title" />
+                android:id="@+id/selectionList" />
 
         </LinearLayout>
     </LinearLayout>
