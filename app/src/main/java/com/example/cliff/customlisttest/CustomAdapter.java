@@ -40,8 +40,7 @@ public class CustomAdapter extends BaseAdapter {
         //m_Context = context;
     }
 
-    // ADD methods.
-
+    // region ADD methods.
     public void addItem(PlayerData pd, int pos) {
         if (pos < items.size()) {
             items.add(pos, pd);
@@ -55,9 +54,15 @@ public class CustomAdapter extends BaseAdapter {
         items.add(pd);
         notifyDataSetChanged();
     }
+    //endregion
 
+    // RETRIEVE method
+    @Override
+    public Object getItem(int position) {
+        return items.get(position);
+    }
 
-    // REMOVE methods
+    // region REMOVE methods
     public void removeItem(int pos) {
         items.remove(pos);
         notifyDataSetChanged();
@@ -67,20 +72,12 @@ public class CustomAdapter extends BaseAdapter {
         items.clear();
         this.notifyDataSetChanged();
     }
-
+    //endregion
 
     @Override
     public int getCount() {
-        // TODO Auto-generated method stub
-
         // Return item count.
         return items.size();
-    }
-
-    @Override
-    public Object getItem(int position) {
-        // TODO Auto-generated method stub
-        return position;
     }
 
     @Override
@@ -92,7 +89,6 @@ public class CustomAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        // TODO Auto-generated method stub
         final ViewHolder vh;
         vh = new ViewHolder();
 
@@ -106,8 +102,8 @@ public class CustomAdapter extends BaseAdapter {
                     m_res.getIdentifier("background_" + vh.pd.team, "string", m_PackageName)
             );
             GradientDrawable gd = new GradientDrawable(
-                    GradientDrawable.Orientation.TOP_BOTTOM,
-                    new int[]{Color.parseColor(bgColor), 0}
+                GradientDrawable.Orientation.TOP_BOTTOM,
+                new int[]{Color.parseColor(bgColor), 0}
             );
             convertView.setBackground(gd);
 
@@ -147,8 +143,6 @@ public class CustomAdapter extends BaseAdapter {
 
         return convertView;
     }
-
-
 
     class ViewHolder {
         ImageView i_Team;
