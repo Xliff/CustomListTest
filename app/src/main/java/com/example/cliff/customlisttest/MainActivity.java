@@ -1,16 +1,15 @@
 package com.example.cliff.customlisttest;
 
 import android.content.Context;
-import android.media.Image;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 
+import com.example.cliff.customlisttest.data.DragData;
 import com.example.cliff.customlisttest.data.PlayerData;
 
 public class MainActivity extends AppCompatActivity {
@@ -19,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ImageView m_ImageDrag;
     private View m_MainLayout;
+    private DragData m_DragData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         lvSelects.setAdapter(sla);
         lvPlayers.setDragImage(m_ImageDrag);
         lvSelects.setDragImage(m_ImageDrag);
+        lvSelects.setDragTarget(true);
 
         setContentView(m_MainLayout);
     }
@@ -70,4 +71,15 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    //region GETTERS AND SETTERS
+    //
+    public DragData getDragData() {
+        return m_DragData;
+    }
+
+    public void setDragData(DragData m_DragData) {
+        this.m_DragData = m_DragData;
+    }
+    //endregion
 }

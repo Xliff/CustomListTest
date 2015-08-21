@@ -3,7 +3,6 @@ package com.example.cliff.customlisttest;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
@@ -14,6 +13,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.cliff.customlisttest.data.DragData;
 import com.example.cliff.customlisttest.data.PlayerData;
 
 import java.io.IOException;
@@ -89,8 +89,8 @@ public class CustomAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        final ViewHolder vh;
-        vh = new ViewHolder();
+        final DragData vh;
+        vh = new DragData();
 
         if (convertView == null) {
             convertView = mInflater.inflate(R.layout.custom_row, parent, false);
@@ -143,13 +143,5 @@ public class CustomAdapter extends BaseAdapter {
 
         return convertView;
     }
-
-    class ViewHolder {
-        ImageView i_Team;
-        TextView tv_pos, tv_fn, tv_ln, tv_bye, tv_rank;
-        PlayerData pd;
-        Bitmap b;
-    }
-
 }
 
