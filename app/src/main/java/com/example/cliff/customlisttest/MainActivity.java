@@ -7,7 +7,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.example.cliff.customlisttest.data.DragData;
 import com.example.cliff.customlisttest.data.PlayerData;
@@ -31,23 +33,30 @@ public class MainActivity extends AppCompatActivity {
 
         CustomAdapter pla = new CustomAdapter(this);
         CustomAdapter sla = new CustomAdapter(this);
+        DragDropListView lvPlayers = (DragDropListView)findViewById(R.id.playerList);
+        DragDropListView lvSelects  = (DragDropListView)findViewById(R.id.selectionList);
+        lvPlayers.setAdapter(pla);
+        lvSelects.setAdapter(sla);
         String teams[] = {"ATL", "GB", "DAL", "NO", "SF", "CHI", "HOU", "TEN"};
         for (String t: teams) {
             pla.addItem(
                     new PlayerData("QB", "Robert", "Griffin III", t, 5, 72)
             );
         }
+        pla.notifyDataSetChanged();
+
         // TODO: Get selections from retrieved service data.
 
-        DragDropListView lvPlayers = (DragDropListView)findViewById(R.id.playerList);
-        DragDropListView lvSelects = (DragDropListView)findViewById(R.id.selectionList);
-        lvPlayers.setAdapter(pla);
-        lvSelects.setAdapter(sla);
         lvPlayers.setDragImage(m_ImageDrag);
         lvSelects.setDragImage(m_ImageDrag);
         lvSelects.setDragTarget(true);
 
-        setContentView(m_MainLayout);
+        Toast.makeText(
+            getApplicationContext(),
+            "Total number of Items are: " + String.valueOf(lvPlayers.getAdapter().getCount()),
+            Toast.LENGTH_LONG
+        ).show();
+
     }
 
     @Override

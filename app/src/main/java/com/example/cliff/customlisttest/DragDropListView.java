@@ -5,7 +5,9 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
@@ -112,7 +114,9 @@ public class DragDropListView extends ListView {
         );
         m_BorderColor = array.getColor(0, 0xFF00FF);
         m_DragImage = null;
-        m_A = (MainActivity)context;
+        if (!this.isInEditMode()) {
+            m_A = (MainActivity) context;
+        }
     }
     //endregion
 
@@ -158,17 +162,17 @@ public class DragDropListView extends ListView {
 
                 mTotalOffset = 0;
 
-                int position = pointToPosition(mDownX, mDownY);
-                int itemNum = position - getFirstVisiblePosition();
+                //int position = pointToPosition(mDownX, mDownY);
+                //int itemNum = position - getFirstVisiblePosition();
 
-                View selectedView = getChildAt(itemNum);
+                View selectedView = getChildAt(pos);
                 selectedView.setVisibility(INVISIBLE);
                 m_SelectionMobile = true;
 
                 // Stores the data associated with the selected view.
                 DragData dd = ((DragData)selectedView.getTag());
                 // cw: This will be used by the SELECTED list when we need to delete an item.
-                dd.origListPosition = itemNum;
+                dd.origListPosition = pos;
                 m_A.setDragData(dd);
 
                 // TODO: Must check to see if the Canvas returned belongs to the control or the parent.
@@ -244,6 +248,9 @@ public class DragDropListView extends ListView {
             default:
                 break;
         }
+
+        // Use a ValueAnimator with PropertyValuesHolder instances to animate point X,Y. Everytime the frame is
+        // drawn, call invalidate().
 
         return super.onTouchEvent(event);
     }

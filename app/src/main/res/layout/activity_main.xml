@@ -45,9 +45,10 @@
                 android:layout_marginTop="20dp" />
 
             <com.example.cliff.customlisttest.DragDropListView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/playerList" />
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/playerList"
+                android:visibility="visible" />
 
         </LinearLayout>
 
@@ -66,9 +67,11 @@
                 android:layout_marginTop="20dp" />
 
             <com.example.cliff.customlisttest.DragDropListView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/selectionList" />
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/selectionList"
+                android:layout_weight="0.5"
+                android:visibility="visible" />
 
         </LinearLayout>
     </LinearLayout>
