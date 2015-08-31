@@ -64,14 +64,9 @@ public class DragDropListView extends ListView {
     // TODO: Set below to true to limit control to sorting ONLY.
     private boolean m_LimitBounds = false;
 
-    private int m_BorderSize = 0;
-    private int m_BorderColor;
-    private ImageView m_DragImage;
 
-    private Bitmap m_DragBitmap;
 
-    private int mDownY = -1;
-    private int mDownX = -1;
+
 
     private int mTotalOffset = 0;
     private int mSmoothScrollAmountAtEdge = 0;
@@ -109,42 +104,16 @@ public class DragDropListView extends ListView {
         DisplayMetrics metrics = m_R.getDisplayMetrics();
         mSmoothScrollAmountAtEdge = (int)(SMOOTH_SCROLL_AMOUNT_AT_EDGE / metrics.density);
 
-        TypedArray array = context.getTheme().obtainStyledAttributes(
-                new int[]{ android.R.attr.colorBackground }
-        );
-        m_BorderColor = array.getColor(0, 0xFF00FF);
-        m_DragImage = null;
         if (!this.isInEditMode()) {
             m_A = (MainActivity) context;
         }
     }
     //endregion
 
-    /**
-     * Creates the hover cell with the appropriate bitmap and of appropriate
-     * size. The hover cell's BitmapDrawable is drawn on top of the bitmap every
-     * single time an invalidate call is made.
-
-    private BitmapDrawable getDragDrawable(View v) {
-
-        int w = v.getWidth();
-        int h = v.getHeight();
-        int top = v.getTop();
-        int left = v.getLeft();
-
-        Bitmap b = StaticUtils.getBitmapWithBorder(v);
-
-        BitmapDrawable drawable = new BitmapDrawable(m_R, b);
-
-        mHoverCellOriginalBounds = new Rect(left, top, left + w, top + h);
-        mHoverCellCurrentBounds = new Rect(mHoverCellOriginalBounds);
-
-        drawable.setBounds(mHoverCellCurrentBounds);
-
-        return drawable;
-    }
-    */
-
+        // cw; No longer using this AT ALL, it will be removed after the next commit.
+    // --8/26/2015
+    //region DEPRECATED DISPATCHDRAW
+    /*
     @Override
     protected void dispatchDraw(Canvas canvas) {
         super.dispatchDraw(canvas);
@@ -153,43 +122,42 @@ public class DragDropListView extends ListView {
             canvas.drawBitmap(m_DragBitmap, m_DragX, m_DragY, null);
         }
     }
-
+    */
+    //endregion
 
     //region LONG CLICK LISTENER
     private AdapterView.OnItemLongClickListener mOnItemLongClickListener =
         new AdapterView.OnItemLongClickListener() {
             public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int pos, long id) {
 
-                mTotalOffset = 0;
+            DragDropListView selectedView = (DragDropListView) getChildAt(pos);
 
-                //int position = pointToPosition(mDownX, mDownY);
-                //int itemNum = position - getFirstVisiblePosition();
+            // Stores the data associated with the selected view.
+            DragData dd = ((DragData)selectedView.getTag());
+            // cw: This will be used by the SELECTED list when we need to delete an item.
+            dd.origListPosition = pos;
 
-                View selectedView = getChildAt(pos);
-                selectedView.setVisibility(INVISIBLE);
-                m_SelectionMobile = true;
+            // TODO: Must check to see if the Canvas returned belongs to the control or the parent.
+            Bitmap b = StaticUtils.getBitmapWithBorder(selectedView);
+            if (dd.b == null) {
+                dd.b = b;
+                // cw: May not be necessary.
+                selectedView.setTag(dd);
+            }
 
-                // Stores the data associated with the selected view.
-                DragData dd = ((DragData)selectedView.getTag());
-                // cw: This will be used by the SELECTED list when we need to delete an item.
-                dd.origListPosition = pos;
-                m_A.setDragData(dd);
+            m_A.setDragViewOrigin(selectedView);
 
-                // TODO: Must check to see if the Canvas returned belongs to the control or the parent.
-                m_DragBitmap = StaticUtils.getBitmapWithBorder(selectedView);
-
-                if (dd.b == null) {
-                    dd.b = m_DragBitmap;
-                    // cw: May not be necessary.
-                    selectedView.setTag(dd);
-                }
-
-                return true;
+            return true;
             }
         };
     //endregion
 
-    // Next, override onTouchEvent.
+    // cw:
+    //  onTouchEvent is no longer necessary for the drag operation, but we might use it for
+    //  something else, like hover detection.
+    // -- 8/26/2015
+    //region DEPRECATED ONTOUCHEVENT
+    /*
     @Override
     public boolean onTouchEvent (MotionEvent event) {
 
@@ -231,10 +199,10 @@ public class DragDropListView extends ListView {
                 break;
 
             case MotionEvent.ACTION_POINTER_UP:
-                /* If a multitouch event took place and the original touch dictating
-                 * the movement of the hover cell has ended, then the dragging event
-                 * ends and the hover cell is animated to its corresponding position
-                 * in the listview. */
+                // If a multitouch event took place and the original touch dictating
+                // the movement of the hover cell has ended, then the dragging event
+                // ends and the hover cell is animated to its corresponding position
+                // in the listview.
                 pointerIndex = (event.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >>
                     MotionEvent.ACTION_POINTER_INDEX_SHIFT;
                 final int pointerId = event.getPointerId(pointerIndex);
@@ -254,7 +222,8 @@ public class DragDropListView extends ListView {
 
         return super.onTouchEvent(event);
     }
-
+    */
+    //endregion
 
     //region GETTERS AND SETTERS
     //
@@ -272,30 +241,6 @@ public class DragDropListView extends ListView {
 
     public void setDrawItemBorder(Boolean m_DrawItemBorder) {
         this.m_DrawItemBorder = m_DrawItemBorder;
-    }
-
-    public int getBorderSize() {
-        return m_BorderSize;
-    }
-
-    public void setBorderSize(int m_BorderSize) {
-        this.m_BorderSize = m_BorderSize;
-    }
-
-    public int getBorderColor() {
-        return m_BorderColor;
-    }
-
-    public void setBorderColor(int m_BorderColor) {
-        this.m_BorderColor = m_BorderColor;
-    }
-
-    public ImageView getDragImage() {
-        return m_DragImage;
-    }
-
-    public void setDragImage(ImageView m_DragImage) {
-        this.m_DragImage = m_DragImage;
     }
 
     public boolean getLimitBounds() {
