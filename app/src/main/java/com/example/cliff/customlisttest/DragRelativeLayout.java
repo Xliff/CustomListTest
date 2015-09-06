@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -85,16 +86,18 @@ public class DragRelativeLayout extends RelativeLayout {
     //endregion
 
     @Override
-    public void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-
+    public void dispatchDraw(Canvas canvas) {
+        super.dispatchDraw(canvas);
         if (m_DragBitmap != null) {
-            canvas.drawBitmap(m_DragBitmap, m_DownX, m_DownY, null);
+            // cw: Force drag image to be centered on touch.
+            float centerX = m_DownX - m_DragBitmap.getWidth() / 2;
+            float centerY = m_DownY - m_DragBitmap.getHeight() / 2;
+            canvas.drawBitmap(m_DragBitmap, centerX, centerY, null);
         }
     }
 
     public void unsetDragViewOrigin() {
-        if (!m_DroppedOnTarget) {
+        if (m_DroppedOnTarget == null || m_DroppedOnTarget == false) {
             // cw: Handle animation before this method called.
             m_DragViewOrigin.setVisibility(View.VISIBLE);
         } else {
@@ -107,8 +110,8 @@ public class DragRelativeLayout extends RelativeLayout {
     }
 
     @Override
-    public boolean onTouchEvent (MotionEvent event) {
-
+    public boolean dispatchTouchEvent (MotionEvent event) {
+        Log.d("customlisttest.onTouch","onTouch called");
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
                 m_DownX = event.getX();
@@ -123,15 +126,17 @@ public class DragRelativeLayout extends RelativeLayout {
                 // TODO: Handle cell swapping, if a drag target.
                 // TODO: Handle scrolling.
 
-                return false;
+                break;
 
             case MotionEvent.ACTION_UP:
                 //touchEventsEnded();
+                unsetDragViewOrigin();
                 invalidate();
                 break;
 
             case MotionEvent.ACTION_CANCEL:
                 //touchEventsCancelled();
+                unsetDragViewOrigin();
                 invalidate();
                 break;
 
@@ -149,6 +154,7 @@ public class DragRelativeLayout extends RelativeLayout {
 //                        invalidate();
 //                    }
                 unsetDragViewOrigin();
+                invalidate();
                 break;
 
             default:
@@ -158,7 +164,7 @@ public class DragRelativeLayout extends RelativeLayout {
         // Use a ValueAnimator with PropertyValuesHolder instances to animate point X,Y. Everytime the frame is
         // drawn, call invalidate().
 
-        return super.onTouchEvent(event);
+        return super.dispatchTouchEvent(event);
     }
 
 }
