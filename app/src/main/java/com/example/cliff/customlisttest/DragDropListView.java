@@ -106,27 +106,12 @@ public class DragDropListView extends ListView {
     }
     //endregion
 
-        // cw; No longer using this AT ALL, it will be removed after the next commit.
-    // --8/26/2015
-    //region DEPRECATED DISPATCHDRAW
-    /*
-    @Override
-    protected void dispatchDraw(Canvas canvas) {
-        super.dispatchDraw(canvas);
-
-        if (m_SelectionMobile) {
-            canvas.drawBitmap(m_DragBitmap, m_DragX, m_DragY, null);
-        }
-    }
-    */
-    //endregion
-
     //region LONG CLICK LISTENER
     private AdapterView.OnItemLongClickListener mOnItemLongClickListener =
         new AdapterView.OnItemLongClickListener() {
             public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int pos, long id) {
 
-            DragDropListView selectedView = (DragDropListView) getChildAt(pos);
+            View selectedView = getChildAt(pos);
 
             // Stores the data associated with the selected view.
             DragData dd = ((DragData)selectedView.getTag());
@@ -146,79 +131,6 @@ public class DragDropListView extends ListView {
             return true;
             }
         };
-    //endregion
-
-    // cw:
-    //  onTouchEvent is no longer necessary for the drag operation, but we might use it for
-    //  something else, like hover detection.
-    // -- 8/26/2015
-    //region DEPRECATED ONTOUCHEVENT
-    /*
-    @Override
-    public boolean onTouchEvent (MotionEvent event) {
-
-        switch (event.getAction() & MotionEvent.ACTION_MASK) {
-            case MotionEvent.ACTION_DOWN:
-                m_DragX = event.getX();
-                m_DragY = event.getY();
-                m_ActivePointerId = event.getPointerId(0);
-                break;
-
-            case MotionEvent.ACTION_MOVE:
-                if (m_ActivePointerId == INVALID_ID) {
-                    break;
-                }
-
-                int pointerIndex = event.findPointerIndex(m_ActivePointerId);
-                if (m_SelectionMobile) {
-                    m_DragX = event.getX();
-                    m_DragY= event.getY();
-                    invalidate();
-
-                    // TODO: Handle cell swapping, if a drag target.
-                    // TODO: Handle scrolling.
-
-                    return false;
-                }
-                break;
-
-            case MotionEvent.ACTION_UP:
-                //touchEventsEnded();
-                m_SelectionMobile = false;
-                invalidate();
-                break;
-
-            case MotionEvent.ACTION_CANCEL:
-                //touchEventsCancelled();
-                m_SelectionMobile = false;
-                invalidate();
-                break;
-
-            case MotionEvent.ACTION_POINTER_UP:
-                // If a multitouch event took place and the original touch dictating
-                // the movement of the hover cell has ended, then the dragging event
-                // ends and the hover cell is animated to its corresponding position
-                // in the listview.
-                pointerIndex = (event.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >>
-                    MotionEvent.ACTION_POINTER_INDEX_SHIFT;
-                final int pointerId = event.getPointerId(pointerIndex);
-                if (pointerId == m_ActivePointerId) {
-                    //touchEventsEnded();
-                    m_SelectionMobile = false;
-                    invalidate();
-                }
-                break;
-
-            default:
-                break;
-        }
-
-        // Use a ValueAnimator with PropertyValuesHolder instances to animate point X,Y. Everytime the frame is
-        // drawn, call invalidate().
-
-        return super.onTouchEvent(event);
-    }
-    */
     //endregion
 
     //region GETTERS AND SETTERS
