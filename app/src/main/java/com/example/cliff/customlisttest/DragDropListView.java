@@ -64,10 +64,6 @@ public class DragDropListView extends ListView {
     // TODO: Set below to true to limit control to sorting ONLY.
     private boolean m_LimitBounds = false;
 
-
-
-
-
     private int mTotalOffset = 0;
     private int mSmoothScrollAmountAtEdge = 0;
 
