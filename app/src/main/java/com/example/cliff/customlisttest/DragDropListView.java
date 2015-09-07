@@ -5,13 +5,17 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -57,8 +61,9 @@ public class DragDropListView extends ListView {
     private final int MOVE_DURATION = 150;
     private final int INVALID_ID = -1;
 
-    private Boolean m_DragTarget = false;
-    private Boolean m_DrawItemBorder = false;
+    private boolean m_DrawItemBorder = false;
+    private boolean m_DragTarget = false;
+    private boolean m_Sortable = false;
     private boolean m_SelectionMobile = false;
     private boolean m_IsMobileScrolling = false;
     // TODO: Set below to true to limit control to sorting ONLY.
@@ -73,6 +78,8 @@ public class DragDropListView extends ListView {
 
     private MainActivity m_A;
     private Resources m_R;
+    private int oldBackgroundColor;
+    private int selBackgroundColor;
 
     private int mScrollState = OnScrollListener.SCROLL_STATE_IDLE;
 
@@ -100,11 +107,57 @@ public class DragDropListView extends ListView {
         DisplayMetrics metrics = m_R.getDisplayMetrics();
         mSmoothScrollAmountAtEdge = (int)(SMOOTH_SCROLL_AMOUNT_AT_EDGE / metrics.density);
 
+        // cw: Must be done before calling getBackgroundColor()
         if (!this.isInEditMode()) {
             m_A = (MainActivity) context;
         }
+
+        getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                // Having problems with NPEs if this gets called too soon.
+                oldBackgroundColor = getBackgroundColor();
+                selBackgroundColor = Color.parseColor("#002200");
+            }
+        });
+
     }
     //endregion
+
+    public int getBackgroundColor() {
+        // cw: Seriously???
+        ColorDrawable cd = ((ColorDrawable)getBackground());
+
+        return (cd == null) ? m_A.getThemeBackgroundColor() : cd.getColor();
+    }
+
+    public boolean onTouchEvent (MotionEvent event) {
+        if (m_DragTarget) {
+            switch (event.getAction() & MotionEvent.ACTION_MASK) {
+
+                case MotionEvent.ACTION_MOVE:
+                    if (getBackgroundColor() == selBackgroundColor) {
+                        setBackgroundColor(oldBackgroundColor);
+                    } else {
+                        if (getBackgroundColor() == oldBackgroundColor) {
+                            setBackgroundColor(selBackgroundColor);
+                        }
+                    }
+                    if (m_Sortable) {
+                        // cw: Handle animation possibilities.
+                        // TODO: Handle cell swapping, if a drag target.
+                        // TODO: Handle scrolling.
+                    }
+                    break;
+
+                default:
+                    break;
+
+            }
+        }
+
+        return super.onTouchEvent(event);
+    }
 
     //region LONG CLICK LISTENER
     private AdapterView.OnItemLongClickListener mOnItemLongClickListener =
@@ -135,11 +188,19 @@ public class DragDropListView extends ListView {
 
     //region GETTERS AND SETTERS
     //
-    public Boolean getDragTarget() {
+    public boolean getSortable() {
+        return m_Sortable;
+    }
+
+    public void setSortable(boolean m_Sortable) {
+        this.m_Sortable = m_Sortable;
+    }
+
+    public boolean getDragTarget() {
         return m_DragTarget;
     }
 
-    public void setDragTarget(Boolean m_DragTarget) {
+    public void setDragTarget(boolean m_DragTarget) {
         this.m_DragTarget = m_DragTarget;
     }
 
@@ -147,7 +208,7 @@ public class DragDropListView extends ListView {
         return m_DrawItemBorder;
     }
 
-    public void setDrawItemBorder(Boolean m_DrawItemBorder) {
+    public void setDrawItemBorder(boolean m_DrawItemBorder) {
         this.m_DrawItemBorder = m_DrawItemBorder;
     }
 

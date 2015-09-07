@@ -7,6 +7,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import com.example.cliff.customlisttest.data.DragData;
@@ -99,7 +100,9 @@ public class DragRelativeLayout extends RelativeLayout {
     public void unsetDragViewOrigin() {
         if (m_DroppedOnTarget == null || m_DroppedOnTarget == false) {
             // cw: Handle animation before this method called.
-            m_DragViewOrigin.setVisibility(View.VISIBLE);
+            if (m_DragViewOrigin != null) {
+                m_DragViewOrigin.setVisibility(View.VISIBLE);
+            }
         } else {
             // cw: If dropped on a target, then notify source to perform its required
             // operations for this event.
@@ -109,9 +112,35 @@ public class DragRelativeLayout extends RelativeLayout {
         m_DragBitmap = null;
     }
 
+    public View getChildUnderEvent(MotionEvent ev) {
+        return getChildUnderEvent(this, ev);
+    }
+
+    public View getChildUnderEvent(ViewGroup v, MotionEvent ev) {
+        int x = Math.round(ev.getX());
+        int y = Math.round(ev.getY());
+        for (int i = 0; i < v.getChildCount(); i++) {
+            View child = v.getChildAt(i);
+
+            if (
+                x > child.getLeft()  &&
+                x < child.getRight() &&
+                y > child.getTop()   &&
+                y < child.getBottom()
+            ) {
+                if (child instanceof ViewGroup) {
+                    return getChildUnderEvent((ViewGroup)child, ev);
+                } else {
+                    return child;
+                }
+            }
+        }
+
+        return null;
+    }
+
     @Override
     public boolean dispatchTouchEvent (MotionEvent event) {
-        Log.d("customlisttest.onTouch","onTouch called");
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
                 m_DownX = event.getX();
@@ -123,8 +152,10 @@ public class DragRelativeLayout extends RelativeLayout {
                 m_DownY = event.getY();
                 invalidate();
 
-                // TODO: Handle cell swapping, if a drag target.
-                // TODO: Handle scrolling.
+                View v = getChildUnderEvent(event);
+                if (v instanceof DragDropListView) {
+                    v.onTouchEvent(event);
+                }
 
                 break;
 

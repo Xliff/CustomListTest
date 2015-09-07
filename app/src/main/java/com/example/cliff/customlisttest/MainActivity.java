@@ -32,10 +32,8 @@ public class MainActivity extends AppCompatActivity {
         m_MainLayout = (DragRelativeLayout)findViewById(R.id.mainLayoutID);
 
         // Other field initializers.
-        TypedArray array = context.getTheme().obtainStyledAttributes(
-            new int[]{ android.R.attr.colorBackground }
-        );
-        m_BorderColor = array.getColor(0, 0xFF00FF);
+
+        m_BorderColor = getThemeBackgroundColor();
         //m_DragImage = null;
 
         CustomAdapter pla = new CustomAdapter(this);
@@ -54,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
         // TODO: Get selections from retrieved service data.
         lvSelects.setDragTarget(true);
+        lvSelects.setSortable(true);
 
         Toast.makeText(
             getApplicationContext(),
@@ -62,6 +61,19 @@ public class MainActivity extends AppCompatActivity {
         ).show();
     }
 
+    public int getThemeBackgroundColor() {
+        TypedArray array = context.getTheme().obtainStyledAttributes(
+                new int[]{ android.R.attr.colorBackground }
+        );
+
+        return array.getColor(0, 0xFF00FF);
+    }
+
+    public boolean isCurrentlyDragging() {
+        return m_MainLayout.getDragBitmap() != null;
+    }
+
+    //region Auto-generated code
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -83,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+    //endregion
 
     //region GETTERS AND SETTERS
     //
