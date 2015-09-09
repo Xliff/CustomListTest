@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 
 import com.example.cliff.customlisttest.data.DragData;
@@ -27,8 +28,9 @@ public class DragRelativeLayout extends RelativeLayout {
 
     private Bitmap m_DragBitmap;
     private Boolean m_DroppedOnTarget;
-    private View m_DragViewOrigin;
+    private DragData m_DragData;
     private MainActivity m_A;
+    private DragDropListView m_lastListView;
 
     public DragRelativeLayout(Context context) {
         super(context);
@@ -50,7 +52,7 @@ public class DragRelativeLayout extends RelativeLayout {
             m_A = (MainActivity) context;
         }
         m_DroppedOnTarget = null;
-        m_DragViewOrigin = null;
+        m_DragData = null;
     }
 
     //region Getters and Setters
@@ -70,21 +72,35 @@ public class DragRelativeLayout extends RelativeLayout {
         this.m_A = m_A;
     }
 
-    public View getDragViewOrigin() {
-        return m_DragViewOrigin;
+    public DragData getDragData() {
+        return m_DragData;
     }
 
-    public void setDragViewOrigin(View m_DragViewOrigin) {
-        this.m_DragViewOrigin = m_DragViewOrigin;
+    public void setDragData(DragData m_DragData) {
+        this.m_DragData = m_DragData;
         //  1 - Hide the view and store it for later
         //  2 - Get the converted bitmap from the View tag data
         //  3 - Handle the view disposition given the last position in the drag action.
         //      Note that this step is handled in the private ViewGroup sub-class.
-        DragData dd = (DragData)m_DragViewOrigin.getTag();
-        setDragBitmap(dd.b);
-        m_DragViewOrigin.setVisibility(View.INVISIBLE);
+        setDragBitmap(m_DragData.b);
+        m_DragData.itemView.setVisibility(View.INVISIBLE);
     }
-    //endregion
+    //endregio
+
+    public void unsetDragData() {
+        if (m_DroppedOnTarget == null || m_DroppedOnTarget == false) {
+            // cw: Handle animation before this method called.
+            if (m_DragData != null) {
+                m_DragData.itemView.setVisibility(View.VISIBLE);
+            }
+        } else {
+            // cw: If dropped on a target, then notify source to perform its required
+            // operations for this event.
+        }
+        m_DragData = null;
+        m_DroppedOnTarget = null;
+        m_DragBitmap = null;
+    }
 
     @Override
     public void dispatchDraw(Canvas canvas) {
@@ -95,21 +111,6 @@ public class DragRelativeLayout extends RelativeLayout {
             float centerY = m_DownY - m_DragBitmap.getHeight() / 2;
             canvas.drawBitmap(m_DragBitmap, centerX, centerY, null);
         }
-    }
-
-    public void unsetDragViewOrigin() {
-        if (m_DroppedOnTarget == null || m_DroppedOnTarget == false) {
-            // cw: Handle animation before this method called.
-            if (m_DragViewOrigin != null) {
-                m_DragViewOrigin.setVisibility(View.VISIBLE);
-            }
-        } else {
-            // cw: If dropped on a target, then notify source to perform its required
-            // operations for this event.
-        }
-        m_DragViewOrigin = null;
-        m_DroppedOnTarget = null;
-        m_DragBitmap = null;
     }
 
     public View getChildUnderEvent(MotionEvent ev) {
@@ -123,13 +124,14 @@ public class DragRelativeLayout extends RelativeLayout {
             View child = v.getChildAt(i);
 
             if (
-                x > child.getLeft()  &&
-                x < child.getRight() &&
-                y > child.getTop()   &&
-                y < child.getBottom()
+                x >= (v.getLeft() + child.getLeft()) &&
+                x <= (v.getLeft() + child.getRight()) &&
+                y >= (v.getTop() + child.getTop()) &&
+                y <= (v.getTop() + child.getBottom())
             ) {
-                if (child instanceof ViewGroup) {
-                    return getChildUnderEvent((ViewGroup)child, ev);
+                // cw: Descend ViewGroup objects unless it is a ListView
+                if (child instanceof ViewGroup && !(child instanceof ListView)) {
+                    return getChildUnderEvent((ViewGroup) child, ev);
                 } else {
                     return child;
                 }
@@ -141,6 +143,7 @@ public class DragRelativeLayout extends RelativeLayout {
 
     @Override
     public boolean dispatchTouchEvent (MotionEvent event) {
+
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
                 m_DownX = event.getX();
@@ -150,24 +153,54 @@ public class DragRelativeLayout extends RelativeLayout {
             case MotionEvent.ACTION_MOVE:
                 m_DownX = event.getX();
                 m_DownY = event.getY();
+
+                m_A.setPosText(
+                    "Pos: " +
+                        "X = " + String.format("%f.1", Float.valueOf(m_DownX)) + " " +
+                        "Y = " + String.format("%f.1", Float.valueOf(m_DownY))
+                );
+
                 invalidate();
 
-                View v = getChildUnderEvent(event);
-                if (v instanceof DragDropListView) {
-                    v.onTouchEvent(event);
-                }
+                if (m_A.isCurrentlyDragging()) {
+                    View v = getChildUnderEvent(event);
+                    // cw: Only fire event if we are NOT the DragDropListView where touch originated.
+                    if (v == null) {
+                        if (m_lastListView != null) {
+                            m_lastListView.onDragBlur();
+                            m_lastListView = null;
+                        }
+                        break;
+                    }
 
+                    if (v instanceof DragDropListView) {
+                        if (!v.equals(m_DragData.originView)) {
+                            if (((DragDropListView) v).getDragTarget()) {
+                                m_lastListView = (DragDropListView)v;
+                                m_lastListView.onDragHover();
+
+                            }
+                        }
+                    } else {
+                        if (m_lastListView != null) {
+                            m_lastListView.onDragBlur();
+                            m_lastListView = null;
+                        }
+                    }
+                }
                 break;
 
             case MotionEvent.ACTION_UP:
                 //touchEventsEnded();
-                unsetDragViewOrigin();
+                unsetDragData();
+                m_A.resetBackgrounds();
+                m_A.setPosText("");
                 invalidate();
                 break;
 
             case MotionEvent.ACTION_CANCEL:
                 //touchEventsCancelled();
-                unsetDragViewOrigin();
+                unsetDragData();
                 invalidate();
                 break;
 
@@ -184,7 +217,7 @@ public class DragRelativeLayout extends RelativeLayout {
 //                        m_SelectionMobile = false;
 //                        invalidate();
 //                    }
-                unsetDragViewOrigin();
+                unsetDragData();
                 invalidate();
                 break;
 
@@ -196,6 +229,7 @@ public class DragRelativeLayout extends RelativeLayout {
         // drawn, call invalidate().
 
         return super.dispatchTouchEvent(event);
+
     }
 
 }

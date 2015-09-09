@@ -111,13 +111,16 @@ public class DragDropListView extends ListView {
         if (!this.isInEditMode()) {
             m_A = (MainActivity) context;
         }
+        selBackgroundColor = Color.parseColor("#00002200");
 
+        DragDropListView thisView = this;
         getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                // Having problems with NPEs if this gets called too soon.
+                // cw: Having problems with NPEs if this gets called too soon.
                 oldBackgroundColor = getBackgroundColor();
-                selBackgroundColor = Color.parseColor("#002200");
+                // Call only ONCE!
+                getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
         });
 
@@ -131,18 +134,29 @@ public class DragDropListView extends ListView {
         return (cd == null) ? m_A.getThemeBackgroundColor() : cd.getColor();
     }
 
+    public void resetBackground() {
+        setBackgroundColor(oldBackgroundColor);
+    }
+
+    public void onDragHover() {
+        if (m_DragTarget) {
+            setBackgroundColor(selBackgroundColor);
+            invalidate();
+        }
+    }
+
+    public void onDragBlur() {
+        if (m_DragTarget) {
+            //resetBackground();
+        }
+    }
+
     public boolean onTouchEvent (MotionEvent event) {
         if (m_DragTarget) {
             switch (event.getAction() & MotionEvent.ACTION_MASK) {
 
+                // cw: Drag hovering will have to be done at the Layout level. *sigh*
                 case MotionEvent.ACTION_MOVE:
-                    if (getBackgroundColor() == selBackgroundColor) {
-                        setBackgroundColor(oldBackgroundColor);
-                    } else {
-                        if (getBackgroundColor() == oldBackgroundColor) {
-                            setBackgroundColor(selBackgroundColor);
-                        }
-                    }
                     if (m_Sortable) {
                         // cw: Handle animation possibilities.
                         // TODO: Handle cell swapping, if a drag target.
@@ -160,6 +174,7 @@ public class DragDropListView extends ListView {
     }
 
     //region LONG CLICK LISTENER
+    View thisView = this;
     private AdapterView.OnItemLongClickListener mOnItemLongClickListener =
         new AdapterView.OnItemLongClickListener() {
             public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int pos, long id) {
@@ -170,6 +185,8 @@ public class DragDropListView extends ListView {
             DragData dd = ((DragData)selectedView.getTag());
             // cw: This will be used by the SELECTED list when we need to delete an item.
             dd.origListPosition = pos;
+            dd.originView = thisView;
+            dd.itemView = selectedView;
 
             // TODO: Must check to see if the Canvas returned belongs to the control or the parent.
             Bitmap b = StaticUtils.getBitmapWithBorder(selectedView);
@@ -179,7 +196,7 @@ public class DragDropListView extends ListView {
                 selectedView.setTag(dd);
             }
 
-            m_A.setDragViewOrigin(selectedView);
+            m_A.setDragData(dd);
 
             return true;
             }

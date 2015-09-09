@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cliff.customlisttest.data.DragData;
@@ -18,10 +19,8 @@ public class MainActivity extends AppCompatActivity {
     private Context context;
 
     private DragRelativeLayout m_MainLayout;
-    private DragData m_DragData;
-
-    private int m_BorderSize = 0;
-    private int m_BorderColor;
+    private TextView m_PosText;
+    private DragDropListView m_PlayerList, m_SelectionList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,18 +29,16 @@ public class MainActivity extends AppCompatActivity {
 
         context = this;
         m_MainLayout = (DragRelativeLayout)findViewById(R.id.mainLayoutID);
-
-        // Other field initializers.
-
-        m_BorderColor = getThemeBackgroundColor();
-        //m_DragImage = null;
+        m_PosText = (TextView)findViewById(R.id.dragPositionText);
+        setPosText("");
 
         CustomAdapter pla = new CustomAdapter(this);
         CustomAdapter sla = new CustomAdapter(this);
-        DragDropListView lvPlayers = (DragDropListView)findViewById(R.id.playerList);
-        DragDropListView lvSelects  = (DragDropListView)findViewById(R.id.selectionList);
-        lvPlayers.setAdapter(pla);
-        lvSelects.setAdapter(sla);
+        m_PlayerList = (DragDropListView)findViewById(R.id.playerList);
+        m_SelectionList  = (DragDropListView)findViewById(R.id.selectionList);
+
+        m_PlayerList.setAdapter(pla);
+        m_SelectionList.setAdapter(sla);
         String teams[] = {"ATL", "GB", "DAL", "NO", "SF", "CHI", "HOU", "TEN"};
         for (String t: teams) {
             pla.addItem(
@@ -51,14 +48,19 @@ public class MainActivity extends AppCompatActivity {
         pla.notifyDataSetChanged();
 
         // TODO: Get selections from retrieved service data.
-        lvSelects.setDragTarget(true);
-        lvSelects.setSortable(true);
+        m_SelectionList.setDragTarget(true);
+        m_SelectionList.setSortable(true);
 
         Toast.makeText(
             getApplicationContext(),
-            "Total number of Items are: " + String.valueOf(lvPlayers.getAdapter().getCount()),
+            "Total number of Items are: " + String.valueOf(m_SelectionList.getAdapter().getCount()),
             Toast.LENGTH_LONG
         ).show();
+    }
+
+    public void resetBackgrounds() {
+        m_PlayerList.resetBackground();
+        m_SelectionList.resetBackground();
     }
 
     public int getThemeBackgroundColor() {
@@ -67,6 +69,10 @@ public class MainActivity extends AppCompatActivity {
         );
 
         return array.getColor(0, 0xFF00FF);
+    }
+
+    public void setPosText(String text) {
+        m_PosText.setText(text);
     }
 
     public boolean isCurrentlyDragging() {
@@ -99,20 +105,16 @@ public class MainActivity extends AppCompatActivity {
 
     //region GETTERS AND SETTERS
     //
-    public DragData getDragData() {
-        return m_DragData;
+    public void setDragData(DragData dd) {
+        m_MainLayout.setDragData(dd);
     }
 
-    public void setDragData(DragData m_DragData) {
-        this.m_DragData = m_DragData;
+    public DragData getDragData () {
+        return m_MainLayout.getDragData();
     }
 
-    public View getDragViewOrigin() {
-        return m_MainLayout.getDragViewOrigin();
-    }
-
-    public void setDragViewOrigin(View m_DragViewOrigin) {
-        m_MainLayout.setDragViewOrigin(m_DragViewOrigin);
+    public void setDragViewOrigin(DragData dd) {
+        m_MainLayout.setDragData(dd);
     }
    //endregion
 }
