@@ -6,6 +6,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.cliff.customlisttest.DragDropListView;
+
 /**
  * Created by Cliff on 8/20/2015.
  */
@@ -15,5 +17,6 @@ public class DragData {
     public PlayerData pd = null;
     public Bitmap b = null;
     public int origListPosition;
-    public View originView, itemView;
+    public View itemView;
+    public DragDropListView originView;
 }

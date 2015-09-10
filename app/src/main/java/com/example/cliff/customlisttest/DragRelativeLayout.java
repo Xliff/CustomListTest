@@ -12,6 +12,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 
 import com.example.cliff.customlisttest.data.DragData;
+import com.example.cliff.customlisttest.interfaces.DragTargetAction;
 import com.example.cliff.customlisttest.utils.ReflectionUtils;
 
 /**
@@ -194,6 +195,9 @@ public class DragRelativeLayout extends RelativeLayout {
 
             case MotionEvent.ACTION_UP:
                 //touchEventsEnded();
+                if (lastViewOver instanceof DragTargetAction) {
+                    ((DragTargetAction) lastViewOver).acceptTarget();
+                }
                 unsetDragData();
                 m_A.resetBackgrounds();
                 m_A.setPosText("");

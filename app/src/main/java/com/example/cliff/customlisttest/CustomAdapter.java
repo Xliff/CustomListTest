@@ -95,6 +95,7 @@ public class CustomAdapter extends BaseAdapter {
         // now in question, should probably be moved back here.
         // -- 8/25/2015
         DragData vh;
+        PlayerData pd = m_Items.get(position);
 
         if (convertView == null) {
             convertView = mInflater.inflate(R.layout.custom_row, parent, false);
@@ -106,12 +107,11 @@ public class CustomAdapter extends BaseAdapter {
             vh.tv_bye = (TextView) convertView.findViewById(R.id.t_byeWeek);
             vh.tv_rank = (TextView) convertView.findViewById(R.id.t_adpRank);
             vh.i_Team = (ImageView) convertView.findViewById(R.id.i_Team);
+            vh.pd = pd;
             convertView.setTag(vh);
         } else {
             vh = (DragData) convertView.getTag();
         }
-
-        PlayerData pd = m_Items.get(position);
 
         // Set background -- when we move this to an app, we will have to perform error checking.
         String bgColor = m_res.getString(
