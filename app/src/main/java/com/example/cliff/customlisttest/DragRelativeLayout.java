@@ -184,11 +184,11 @@ public class DragRelativeLayout extends RelativeLayout {
                         break;
                     }
 
-                    if (!lastViewOver.equals(v)) {
+                    if (lastViewOver != null && !lastViewOver.equals(v)) {
                         invokeBlur(lastViewOver);
-                        lastViewOver = v;
                     }
                     invokeHover(v);
+                    lastViewOver = v;
                 }
                 break;
 

@@ -111,7 +111,8 @@ public class DragDropListView extends ListView {
         if (!this.isInEditMode()) {
             m_A = (MainActivity) context;
         }
-        selBackgroundColor = Color.parseColor("#00002200");
+        //selBackgroundColor = Color.parseColor("#00002200");
+        selBackgroundColor = Color.GREEN;
 
         DragDropListView thisView = this;
         getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -141,14 +142,12 @@ public class DragDropListView extends ListView {
     public void onDragHover() {
         if (m_DragTarget && getBackgroundColor() != selBackgroundColor) {
             setBackgroundColor(selBackgroundColor);
-            invalidate();
         }
     }
 
     public void onDragBlur() {
         if (m_DragTarget && getBackgroundColor() == selBackgroundColor) {
             resetBackground();
-            invalidate();
         }
     }
 
