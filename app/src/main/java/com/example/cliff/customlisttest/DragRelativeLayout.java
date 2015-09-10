@@ -12,6 +12,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 
 import com.example.cliff.customlisttest.data.DragData;
+import com.example.cliff.customlisttest.utils.ReflectionUtils;
 
 /**
  * Created by Cliff on 9/6/2015.
@@ -31,6 +32,8 @@ public class DragRelativeLayout extends RelativeLayout {
     private DragData m_DragData;
     private MainActivity m_A;
     private DragDropListView m_lastListView;
+    private View lastViewOver;
+
 
     public DragRelativeLayout(Context context) {
         super(context);
@@ -141,6 +144,14 @@ public class DragRelativeLayout extends RelativeLayout {
         return null;
     }
 
+    private void invokeBlur(View o) {
+        ReflectionUtils.invokeMethod("onDragBlur", o);
+    }
+
+    private void invokeHover(View o) {
+        ReflectionUtils.invokeMethod("onDragHover", o);
+    }
+
     @Override
     public boolean dispatchTouchEvent (MotionEvent event) {
 
@@ -173,20 +184,11 @@ public class DragRelativeLayout extends RelativeLayout {
                         break;
                     }
 
-                    if (v instanceof DragDropListView) {
-                        if (!v.equals(m_DragData.originView)) {
-                            if (((DragDropListView) v).getDragTarget()) {
-                                m_lastListView = (DragDropListView)v;
-                                m_lastListView.onDragHover();
-
-                            }
-                        }
-                    } else {
-                        if (m_lastListView != null) {
-                            m_lastListView.onDragBlur();
-                            m_lastListView = null;
-                        }
+                    if (!lastViewOver.equals(v)) {
+                        invokeBlur(lastViewOver);
+                        lastViewOver = v;
                     }
+                    invokeHover(v);
                 }
                 break;
 

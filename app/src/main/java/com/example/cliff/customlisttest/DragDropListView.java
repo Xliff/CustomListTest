@@ -139,15 +139,16 @@ public class DragDropListView extends ListView {
     }
 
     public void onDragHover() {
-        if (m_DragTarget) {
+        if (m_DragTarget && getBackgroundColor() != selBackgroundColor) {
             setBackgroundColor(selBackgroundColor);
             invalidate();
         }
     }
 
     public void onDragBlur() {
-        if (m_DragTarget) {
-            //resetBackground();
+        if (m_DragTarget && getBackgroundColor() == selBackgroundColor) {
+            resetBackground();
+            invalidate();
         }
     }
 
