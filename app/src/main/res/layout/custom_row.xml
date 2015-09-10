@@ -19,6 +19,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="WWW"
+        style="@style/OutlinedText"
         android:id="@+id/t_Pos" />
 
     <LinearLayout
@@ -32,6 +33,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="Medium Text"
+            style="@style/OutlinedText"
             android:id="@+id/t_lastName" />
 
         <TextView
@@ -39,6 +41,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="Medium Text"
+            style="@style/OutlinedText"
             android:id="@+id/t_firstName" />
     </LinearLayout>
 
@@ -53,6 +56,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="Medium Text"
+            style="@style/OutlinedText"
             android:id="@+id/t_byeWeek"
             android:layout_gravity="right" />
 
@@ -61,6 +65,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="Medium Text"
+            style="@style/OutlinedText"
             android:id="@+id/t_adpRank"
             android:layout_gravity="right" />
     </LinearLayout>

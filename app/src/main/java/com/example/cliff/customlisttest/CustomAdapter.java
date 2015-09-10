@@ -119,7 +119,7 @@ public class CustomAdapter extends BaseAdapter {
         );
         GradientDrawable gd = new GradientDrawable(
                 GradientDrawable.Orientation.TOP_BOTTOM,
-                new int[]{Color.parseColor(bgColor), 0}
+                new int[]{Color.parseColor(bgColor), Color.parseColor("#111111")}
         );
         convertView.setBackground(gd);
 
