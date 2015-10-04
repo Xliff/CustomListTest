@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
         Toast.makeText(
             getApplicationContext(),
-            "Total number of Items are: " + String.valueOf(m_SelectionList.getAdapter().getCount()),
+            "Total number of Items are: " + String.valueOf(m_PlayerList.getAdapter().getCount()),
             Toast.LENGTH_LONG
         ).show();
     }

@@ -1,27 +1,26 @@
 package com.example.cliff.customlisttest;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Resources;
-import android.content.res.TypedArray;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Point;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.example.cliff.customlisttest.data.DragData;
+import com.example.cliff.customlisttest.interfaces.DragActions;
+import com.example.cliff.customlisttest.interfaces.DragTarget;
 import com.example.cliff.customlisttest.utils.StaticUtils;
+
+import java.io.IOException;
 
 /* Much of this cribbed from the following sources:
  *
@@ -56,7 +55,7 @@ import com.example.cliff.customlisttest.utils.StaticUtils;
  */
 
 
-public class DragDropListView extends ListView {
+public class DragDropListView extends ListView implements DragTarget, DragActions {
     private final int SMOOTH_SCROLL_AMOUNT_AT_EDGE = 15;
     private final int MOVE_DURATION = 150;
     private final int INVALID_ID = -1;
@@ -78,8 +77,10 @@ public class DragDropListView extends ListView {
 
     private MainActivity m_A;
     private Resources m_R;
+
     private int oldBackgroundColor;
     private int selBackgroundColor;
+    private CustomAdapter adapter;
 
     private int mScrollState = OnScrollListener.SCROLL_STATE_IDLE;
 
@@ -114,7 +115,6 @@ public class DragDropListView extends ListView {
         //selBackgroundColor = Color.parseColor("#00002200");
         selBackgroundColor = Color.GREEN;
 
-        DragDropListView thisView = this;
         getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
@@ -139,17 +139,31 @@ public class DragDropListView extends ListView {
         setBackgroundColor(oldBackgroundColor);
     }
 
-    public void onDragHover() {
+    //region DragAction methods
+    public void onDragOver() {
         if (m_DragTarget && getBackgroundColor() != selBackgroundColor) {
             setBackgroundColor(selBackgroundColor);
         }
     }
 
-    public void onDragBlur() {
+    public void onDragOut() {
         if (m_DragTarget && getBackgroundColor() == selBackgroundColor) {
             resetBackground();
         }
     }
+    //endregion
+
+    //region DragTarget methods
+    public void acceptTarget() {
+        DragData dd = m_A.getDragData();
+        if (dd == null) return;
+
+        // cw: xxx- If origin is target, then we should abort action!!
+
+        adapter.addItem(dd.pd);
+        dd.originView.removeItem(dd.origListPosition);
+    }
+    //endregion
 
     public boolean onTouchEvent (MotionEvent event) {
         if (m_DragTarget) {
@@ -173,38 +187,74 @@ public class DragDropListView extends ListView {
         return super.onTouchEvent(event);
     }
 
+
     //region LONG CLICK LISTENER
-    View thisView = this;
+    final DragDropListView thisView = this;
     private AdapterView.OnItemLongClickListener mOnItemLongClickListener =
         new AdapterView.OnItemLongClickListener() {
             public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int pos, long id) {
 
-            View selectedView = getChildAt(pos);
+                // cw: Thought... instead of trying to do this the hard way, why not use a single
+                // view from the Adapter and just reset the view elements based on the DragData
+                // tag? -- Just a thought.
+                //View selectedView = ((CustomAdapter)getAdapter()).getViewFromPos(thisView, pos);
+                /*
+                try {
+                    ((CustomAdapter) getAdapter()).populateRowView(arg1);
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
 
-            // Stores the data associated with the selected view.
-            DragData dd = ((DragData)selectedView.getTag());
-            // cw: This will be used by the SELECTED list when we need to delete an item.
-            dd.origListPosition = pos;
-            dd.originView = thisView;
-            dd.itemView = selectedView;
+                    new AlertDialog.Builder(m_A)
+                        .setTitle("Unhandled Exception")
+                        .setMessage("An unexpected error has occurred. This application will now close.")
+                        .setCancelable(false)
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                m_A.finish();
+                            }
+                        })
+                        .show();
 
-            // TODO: Must check to see if the Canvas returned belongs to the control or the parent.
-            Bitmap b = StaticUtils.getBitmapWithBorder(selectedView);
-            if (dd.b == null) {
-                dd.b = b;
-                // cw: May not be necessary.
-                selectedView.setTag(dd);
-            }
+                }
+                */
 
-            m_A.setDragData(dd);
+                DragData dd = ((DragData)arg1.getTag());
+                // cw: Ensure PROPER width and height are preserved for this view.
+                if (dd.height == 0)
+                    dd.height = arg1.getHeight();
+                if (dd.width == 0)
+                    dd.width = arg1.getWidth();
 
-            return true;
+                // cw: This will be used by the SELECTED list when we need to delete an item.
+                dd.origListPosition = pos;
+                dd.originView = thisView;
+                dd.itemView = arg1;
+
+                // cw: This is probably wasted resources (ie... a leak)
+                if (dd.height > 0 && dd.width > 0 && dd.b == null) {
+                    Bitmap b = StaticUtils.getBitmapWithBorder(arg1);
+                    dd.b = b;
+                }
+
+                arg1.setTag(dd);
+                m_A.setDragData(dd);
+
+                return true;
             }
         };
     //endregion
 
+    void removeItem(int remPos) {
+        adapter.removeItem(remPos);
+    }
+
     //region GETTERS AND SETTERS
     //
+    public void setAdapter(CustomAdapter newAdapter) {
+        adapter = newAdapter;
+        super.setAdapter(newAdapter);
+    }
+
     public boolean getSortable() {
         return m_Sortable;
     }

@@ -16,7 +16,7 @@ public class DragData {
     public TextView tv_pos, tv_fn, tv_ln, tv_bye, tv_rank;
     public PlayerData pd = null;
     public Bitmap b = null;
-    public int origListPosition;
+    public int origListPosition, width, height;
     public View itemView;
     public DragDropListView originView;
 }

@@ -12,7 +12,8 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 
 import com.example.cliff.customlisttest.data.DragData;
-import com.example.cliff.customlisttest.interfaces.DragTargetAction;
+import com.example.cliff.customlisttest.interfaces.DragActions;
+import com.example.cliff.customlisttest.interfaces.DragTarget;
 import com.example.cliff.customlisttest.utils.ReflectionUtils;
 
 /**
@@ -145,13 +146,18 @@ public class DragRelativeLayout extends RelativeLayout {
         return null;
     }
 
+    /*
     private void invokeBlur(View o) {
-        ReflectionUtils.invokeMethod("onDragBlur", o);
+        //ReflectionUtils.invokeMethod("onDragBlur", o);
+        if (o instanceof DragActions) {
+            ((DragActions)o).onDragOver();
+        }
     }
 
     private void invokeHover(View o) {
         ReflectionUtils.invokeMethod("onDragHover", o);
     }
+    */
 
     @Override
     public boolean dispatchTouchEvent (MotionEvent event) {
@@ -176,27 +182,36 @@ public class DragRelativeLayout extends RelativeLayout {
 
                 if (m_A.isCurrentlyDragging()) {
                     View v = getChildUnderEvent(event);
+
+                    /*
                     // cw: Only fire event if we are NOT the DragDropListView where touch originated.
                     if (v == null) {
                         if (m_lastListView != null) {
-                            m_lastListView.onDragBlur();
+                            if (m_lastListView instanceof DragActions) {
+                                ((DragActions) m_lastListView).onDragOut();
+                            }
                             m_lastListView = null;
                         }
                         break;
                     }
+                    */
 
                     if (lastViewOver != null && !lastViewOver.equals(v)) {
-                        invokeBlur(lastViewOver);
+                        if (lastViewOver instanceof DragActions) {
+                            ((DragActions)lastViewOver).onDragOut();
+                        }
                     }
-                    invokeHover(v);
+                    if (v != null && v instanceof DragActions) {
+                        ((DragActions)v).onDragOver();
+                    }
                     lastViewOver = v;
                 }
                 break;
 
             case MotionEvent.ACTION_UP:
                 //touchEventsEnded();
-                if (lastViewOver instanceof DragTargetAction) {
-                    ((DragTargetAction) lastViewOver).acceptTarget();
+                if (lastViewOver != null && lastViewOver instanceof DragTarget) {
+                    ((DragTarget) lastViewOver).acceptTarget();
                 }
                 unsetDragData();
                 m_A.resetBackgrounds();
