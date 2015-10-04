@@ -72,7 +72,7 @@ public class CustomAdapter extends BaseAdapter {
 
     public void clear(){
         m_Items.clear();
-        this.notifyDataSetChanged();
+        notifyDataSetChanged();
     }
     //endregion
 

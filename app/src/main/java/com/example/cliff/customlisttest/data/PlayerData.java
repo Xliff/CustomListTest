@@ -1,5 +1,7 @@
 package com.example.cliff.customlisttest.data;
 
+import android.graphics.Bitmap;
+
 /**
  * Created by Cliff on 8/9/2015.
  */
@@ -10,6 +12,8 @@ public class PlayerData {
     public String team;
     public int bye;
     public int rank;
+
+    public Bitmap b;
 
     public PlayerData(
             String pos, String firstname, String lastname, String team, int bye, int rank
@@ -36,6 +40,8 @@ public class PlayerData {
             return false;
         if (lastname != null ? !lastname.equals(that.lastname) : that.lastname != null)
             return false;
+        if (b != null ?  !b.equals(that.b) : that.b != null)
+            return false;
 
         return !(team != null ? !team.equals(that.team) : that.team != null);
     }
@@ -43,6 +49,7 @@ public class PlayerData {
     @Override
     public int hashCode() {
         int result = pos.hashCode();
+        result = 31 * result + (b != null ? b.hashCode() : 0);
         result = 31 * result + (firstname != null ? firstname.hashCode() : 0);
         result = 31 * result + (lastname != null ? lastname.hashCode() : 0);
         result = 31 * result + (team != null ? team.hashCode() : 0);

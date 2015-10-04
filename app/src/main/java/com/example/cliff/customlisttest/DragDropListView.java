@@ -155,10 +155,9 @@ public class DragDropListView extends ListView implements DragTarget, DragAction
 
     //region DragTarget methods
     public void acceptTarget() {
+        if (!getDragTarget()) return;
         DragData dd = m_A.getDragData();
-        if (dd == null) return;
-
-        // cw: xxx- If origin is target, then we should abort action!!
+        if (dd == null || !getDragTarget()) return;
 
         adapter.addItem(dd.pd);
         dd.originView.removeItem(dd.origListPosition);
@@ -219,6 +218,7 @@ public class DragDropListView extends ListView implements DragTarget, DragAction
                 */
 
                 DragData dd = ((DragData)arg1.getTag());
+
                 // cw: Ensure PROPER width and height are preserved for this view.
                 if (dd.height == 0)
                     dd.height = arg1.getHeight();
@@ -230,10 +230,9 @@ public class DragDropListView extends ListView implements DragTarget, DragAction
                 dd.originView = thisView;
                 dd.itemView = arg1;
 
-                // cw: This is probably wasted resources (ie... a leak)
-                if (dd.height > 0 && dd.width > 0 && dd.b == null) {
-                    Bitmap b = StaticUtils.getBitmapWithBorder(arg1);
-                    dd.b = b;
+                // cw: Store Bitmap with PlayerData
+                if (dd.height > 0 && dd.width > 0 && dd.pd.b == null) {
+                    dd.pd.b = StaticUtils.getBitmapWithBorder(arg1);
                 }
 
                 arg1.setTag(dd);
@@ -263,10 +262,12 @@ public class DragDropListView extends ListView implements DragTarget, DragAction
         this.m_Sortable = m_Sortable;
     }
 
+    // for DragTarget
     public boolean getDragTarget() {
         return m_DragTarget;
     }
 
+    // for DragTarget
     public void setDragTarget(boolean m_DragTarget) {
         this.m_DragTarget = m_DragTarget;
     }

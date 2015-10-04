@@ -87,10 +87,10 @@ public class DragRelativeLayout extends RelativeLayout {
         //  2 - Get the converted bitmap from the View tag data
         //  3 - Handle the view disposition given the last position in the drag action.
         //      Note that this step is handled in the private ViewGroup sub-class.
-        setDragBitmap(m_DragData.b);
+        setDragBitmap(m_DragData.pd.b);
         m_DragData.itemView.setVisibility(View.INVISIBLE);
     }
-    //endregio
+    //endregion
 
     public void unsetDragData() {
         if (m_DroppedOnTarget == null || m_DroppedOnTarget == false) {
@@ -210,8 +210,11 @@ public class DragRelativeLayout extends RelativeLayout {
 
             case MotionEvent.ACTION_UP:
                 //touchEventsEnded();
+
                 if (lastViewOver != null && lastViewOver instanceof DragTarget) {
-                    ((DragTarget) lastViewOver).acceptTarget();
+                    DragTarget dt = (DragTarget)lastViewOver;
+                    if (dt.getDragTarget())
+                        dt.acceptTarget();
                 }
                 unsetDragData();
                 m_A.resetBackgrounds();
